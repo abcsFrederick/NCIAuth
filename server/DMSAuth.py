@@ -2,7 +2,7 @@ import requests
 import getpass
 from requests_ntlm import HttpNtlmAuth
 from xml.etree import ElementTree
-
+from girder.models.setting import Setting
 class DMSAuthentication:
     "A Python class for utilizing DMS's Authentication service."
     """Instantiate class with service account username and password as arguments.
@@ -19,9 +19,10 @@ class DMSAuthentication:
         self.python_version = python_version
         self.SSO_SERVICE_ACCOUNT_USERNAME = SSO_SERVICE_ACCOUNT_USERNAME
         self.SSO_SERVICE_ACCOUNT_PASSWORD = SSO_SERVICE_ACCOUNT_PASSWORD
-
+        # print Setting().get('NCIAuth.NCI_Validation_url')
         #Development Token Consumer Service
-        self.SSO_DMS_TOKEN_CONSUMER_URL = 'https://services-staging.ncifcrf.gov/FederatedAuthentication/v1.0/TokenConsumer.svc?singleWsdl'
+        self.SSO_DMS_TOKEN_CONSUMER_URL = Setting().get('NCIAuth.NCI_validation_url')
+
         #Production Token Consumer Service
         #self.SSO_DMS_TOKEN_CONSUMER_URL = 'https://services.ncifcrf.gov/FederatedAuthentication/v1.0/TokenConsumer.svc'
         self.SSO_USER_ATTRIBUTE = "{http://schemas.datacontract.org/2004/07/Dms.Css.Core.FederatedAuthentication.Services}"
@@ -63,8 +64,7 @@ class DMSAuthentication:
             data_arg = bytes(data)
 
         token_service_response = requests.post(self.SSO_DMS_TOKEN_CONSUMER_URL, data_arg, auth=HttpNtlmAuth(self.SSO_SERVICE_ACCOUNT_USERNAME, self.SSO_SERVICE_ACCOUNT_PASSWORD), headers=headers, verify=False)
-        print '66'
-        print(token_service_response.content)
+
         response_xml = ElementTree.fromstring(token_service_response.content)
         token_result = response_xml.find(self.SSO_CONSUME_TOKEN_RESULT)
         self.SSO_USER_ATTRIBUTES["userID"] = token_result.find(self.SSO_USER_PrincipalName).text[:token_result.find(self.SSO_USER_PrincipalName).text.index('@')]
@@ -72,5 +72,4 @@ class DMSAuthentication:
         self.SSO_USER_ATTRIBUTES["last_name"] = token_result.find(self.SSO_USER_LASTNAME).text
         self.SSO_USER_ATTRIBUTES["email"] = token_result.find(self.SSO_USER_EMAIL).text
 
-        print(self.SSO_USER_ATTRIBUTES)#{'first_name': 'Tianyi', 'last_name': 'Miao', 'email': 'tianyi.miao@nih.gov'}
         return self.SSO_USER_ATTRIBUTES

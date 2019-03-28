@@ -1,5 +1,5 @@
 {
-    "name": "NCI Login Plugin",
+    "name": "NCIAuth",
     "description": "Allows users to login use NCI credential.",
     "url": "http://girder.readthedocs.io/en/latest/plugin/NCI_Login.html",
     "version": "0.0.1",
