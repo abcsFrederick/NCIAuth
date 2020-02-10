@@ -25,5 +25,6 @@ class PluginSettings(object):
 
     NCI_CLIENT_ID = 'NCIAuth.NCI_client_id'
     NCI_RETURN_URL = 'NCIAuth.NCI_return_url'
+    NCI_API_URL = 'NCIAuth.NCI_api_url'
     NCI_LOGIN_URL = 'NCIAuth.NCI_login_url'
     NCI_VALIDATION_URL = 'NCIAuth.NCI_validation_url'

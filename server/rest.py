@@ -29,7 +29,7 @@ class NCILogin(Resource):
     Description('GET Current NIH Login url.'))
 
   def loginCallback(self):
-    url = Setting().get(constants.PluginSettings.NCI_RETURN_URL)
+    url = Setting().get(constants.PluginSettings.NCI_API_URL)
     if Setting().get(constants.PluginSettings.PROVIDERS_ENABLED):
       return Setting().get('NCIAuth.NCI_login_url') + '?returnUrl=' + '/'.join((url, 'nciLogin', 'callback'))
     else:

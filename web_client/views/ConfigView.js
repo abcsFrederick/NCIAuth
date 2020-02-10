@@ -17,14 +17,15 @@ var ConfigView = View.extend({
             this.$('#g-oauth-provider-' + providerId + '-error-message').empty();
 
             this._saveSettings(providerId, [{
+                key: 'NCIAuth.' + providerId + '_api_url',
+                value: this.$('#g-oauth-provider-' + providerId + '-api-url').val().trim()
+            }, {
                 key: 'NCIAuth.' + providerId + '_return_url',
                 value: this.$('#g-oauth-provider-' + providerId + '-return-url').val().trim()
-            },
-            {
+            }, {
                 key: 'NCIAuth.' + providerId + '_login_url',
                 value: this.$('#g-oauth-provider-' + providerId + '-login-url').val().trim()
-            },
-            {
+            }, {
                 key: 'NCIAuth.' + providerId + '_validation_url',
                 value: this.$('#g-oauth-provider-' + providerId + '-validation-url').val().trim()
             }]);

@@ -19,6 +19,8 @@
               id=`g-oauth-provider-NCI-form`, provider-id='NCI')
       .form-group
         label.control-label(for=`g-oauth-provider-NCI-client-id`) Return URL
+        input.input-sm.form-control(id=`g-oauth-provider-NCI-api-url`,
+            type="text", placeholder="API URL" required)
         input.input-sm.form-control(id=`g-oauth-provider-NCI-return-url`,
             type="text", placeholder="Return URL" required)
         input.input-sm.form-control(id=`g-oauth-provider-NCI-login-url`,
