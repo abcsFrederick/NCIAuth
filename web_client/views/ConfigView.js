@@ -62,6 +62,7 @@ var ConfigView = View.extend({
 
         var settingKeys = ['NCIAuth.ignore_registration_policy'];
         _.each(this.providerIds, function (id) {
+            settingKeys.push('NCIAuth.' + id + '_api_url');
             settingKeys.push('NCIAuth.' + id + '_return_url');
             settingKeys.push('NCIAuth.' + id + '_login_url');
             settingKeys.push('NCIAuth.' + id + '_validation_url');
@@ -103,6 +104,8 @@ var ConfigView = View.extend({
 
         if (this.settingVals) {
             _.each(this.providerIds, function (id) {
+                this.$('#g-oauth-provider-' + id + '-api-url').val(
+                    this.settingVals['NCIAuth.' + id + '_api_url']);
                 this.$('#g-oauth-provider-' + id + '-return-url').val(
                     this.settingVals['NCIAuth.' + id + '_return_url']);
                 this.$('#g-oauth-provider-' + id + '-login-url').val(
