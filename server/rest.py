@@ -42,7 +42,7 @@ class NCILogin(Resource):
     # print cherrypy.request.params['token']
     token = cherrypy.request.params['token']
 
-    validation = DMSAuthentication("ncifivgSvc",";R_tm$F`\\J\"7Hu{",2)
+    validation = DMSAuthentication("ncifivgSvc","+vYg<^Y|#4w:r9)",2)
     userInfo=validation.validateToken(token)
 
     #validation with service 
