@@ -4,6 +4,7 @@ from girder.api import access
 import cherrypy
 from .DMSAuth import DMSAuthentication
 import re
+import urllib2, requests
 
 from girder import events
 from girder.models.user import User
@@ -23,7 +24,21 @@ class NCILogin(Resource):
 
     self.route('GET', ('loginCallback',), self.loginCallback)
     self.route('GET', ('callback',), self.callback)
+    self.route('GET', ('CIlogin',), self.cilogin)
 
+  @access.public
+  @autoDescribeRoute(
+    Description('GET Current NIH Login url.'))
+  def cilogin(self):
+    data = {
+      'client_id': 'cilogon:/client_id/349f62572450441b8208c692ece2fdf8',
+      'client_secret': 'EHnJeYHJTx542N7ZL2Cs2QjXJn86SdPF-W699zVzH55gSQi-JDXOXQBkxIcuF74R4_A_L7jqNebs23S4Yh2-Vw',
+      'grant_type': 'authorization_code',
+      'redirect_url': 'https://fr-s-ivg-ssr-d1.ncifcrf.gov/ssr'
+    }
+    response = requests.post('https://cilogon.org/oauth2/token', data)
+    # req.add_header('User-agent', 'Mozilla/5.0')
+    print response.content
   @access.public
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
