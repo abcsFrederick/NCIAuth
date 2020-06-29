@@ -39,6 +39,7 @@ class NCILogin(Resource):
     response = requests.post('https://cilogon.org/oauth2/token', data)
     # req.add_header('User-agent', 'Mozilla/5.0')
     print response.content
+    print response.status_code
   @access.public
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
