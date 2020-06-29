@@ -25,6 +25,7 @@ class NCILogin(Resource):
     self.route('GET', ('loginCallback',), self.loginCallback)
     self.route('GET', ('callback',), self.callback)
     self.route('GET', ('CIlogin',), self.cilogin)
+    self.route('GET', ('CIloginUser',), self.ciloginUser)
 
   @access.public
   @autoDescribeRoute(
@@ -40,6 +41,15 @@ class NCILogin(Resource):
     # req.add_header('User-agent', 'Mozilla/5.0')
     print response.content
     print response.status_code
+  @access.public
+  @autoDescribeRoute(
+    Description('GET Current NIH Login url.'))
+  def ciloginUser(self):
+    data = {'access_token': '6b27c71ae7ba97a725a4696f39b8fa8d'}
+    response = requests.post('https://cilogon.org/oauth2/userinfo', data)
+    print response.content
+    print response.status_code
+
   @access.public
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
