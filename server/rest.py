@@ -35,12 +35,9 @@ class NCILogin(Resource):
     d = os.environ
     k = d.keys()
     k.sort()
-    print "Content-type: text/html\n\n"
-    print "<HTML><Head><TITLE>Print Env Variables</TITLE></Head><BODY>"
-    print "<h1>Environment Variables</H1>"
+    print 'a'
     for item in k:
-       print "<p><B>%s</B>: %s </p>" % (item, d[item])
-    print "</BODY></HTML>"
+       print item, d[item]
   @access.public
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
