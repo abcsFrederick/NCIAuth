@@ -24,7 +24,7 @@ class NCILogin(Resource):
 
     self.route('GET', ('loginCallback',), self.loginCallback)
     self.route('GET', ('callback',), self.callback)
-    self.route('GET', ('CIlogin',), self.cilogin)
+    self.route('GET', ('CIloginCallback',), self.cilogin)
     self.route('GET', ('CIloginUser',), self.ciloginUser)
 
   @access.public
