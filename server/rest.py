@@ -31,16 +31,16 @@ class NCILogin(Resource):
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
   def cilogin(self):
-    data = {
-      'client_id': 'cilogon:/client_id/349f62572450441b8208c692ece2fdf8',
-      'client_secret': 'EHnJeYHJTx542N7ZL2Cs2QjXJn86SdPF-W699zVzH55gSQi-JDXOXQBkxIcuF74R4_A_L7jqNebs23S4Yh2-Vw',
-      'grant_type': 'authorization_code',
-      'redirect_url': 'https://fr-s-ivg-ssr-d1.ncifcrf.gov/ssr'
-    }
-    response = requests.post('https://cilogon.org/oauth2/token', data)
-    # req.add_header('User-agent', 'Mozilla/5.0')
-    print response.content
-    print response.status_code
+    import os
+    d = os.environ
+    k = d.keys()
+    k.sort()
+    print "Content-type: text/html\n\n"
+    print "<HTML><Head><TITLE>Print Env Variables</TITLE></Head><BODY>"
+    print "<h1>Environment Variables</H1>"
+    for item in k:
+       print "<p><B>%s</B>: %s </p>" % (item, d[item])
+    print "</BODY></HTML>"
   @access.public
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
