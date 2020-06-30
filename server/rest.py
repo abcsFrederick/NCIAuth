@@ -46,9 +46,9 @@ class NCILogin(Resource):
     userinfo = requests.post('https://cilogon.org/oauth2/userinfo', data)
 
     user = json.loads(userinfo.content)
-    NCIemail = userInfo["email"]
-    NCIfirstName = userInfo["given_name"]
-    NCIlastName = userInfo["family_name"]
+    NCIemail = user["email"]
+    NCIfirstName = user["given_name"]
+    NCIlastName = user["family_name"]
 
     user = User().findOne({'email': NCIemail})
 
