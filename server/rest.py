@@ -45,7 +45,57 @@ class NCILogin(Resource):
     data = {'access_token': access_token}
     userinfo = requests.post('https://cilogon.org/oauth2/userinfo', data)
 
-    print userinfo
+    user = json.loads(userinfo.content)
+    NCIemail = userInfo["email"]
+    NCIfirstName = userInfo["given_name"]
+    NCIlastName = userInfo["family_name"]
+
+    user = User().findOne({'email': NCIemail})
+
+    setId = not user
+    dirty = False
+    if not user:
+      policy = Setting().get(SettingKey.REGISTRATION_POLICY)
+
+      if policy == 'closed':
+        ignore = Setting().get(PluginSettings.IGNORE_REGISTRATION_POLICY)
+        if not ignore:
+          raise RestException(
+            'Registration on this instance is closed. Contact an '
+            'administrator to create an account for you.')
+      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName,NCIid)
+      user = User().createUser(
+        login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
+    else:
+      # Migrate from a legacy format where only 1 provider was stored
+      if isinstance(user.get('oauth'), dict):
+        user['oauth'] = [user['oauth']]
+        dirty = True
+      # Update user data from provider
+      if NCIemail != user['email']:
+        user['email'] = NCIemail
+        dirty = True
+      # Don't set names to empty string
+      if NCIfirstName != user['firstName'] and NCIfirstName:
+        user['firstName'] = NCIfirstName
+        dirty = True
+      if NCIlastName != user['lastName'] and NCIlastName:
+        user['lastName'] = NCIlastName
+        dirty = True
+
+      if setId:
+        user.setdefault('NCI_credential', []).append(
+          {
+            'provider': 'NCI'
+          })
+        dirty = True
+      if dirty:
+        user = User().save(user)
+
+      girderToken = self.sendAuthTokenCookie(user)
+
+      raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
+
   @access.public
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
