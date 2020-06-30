@@ -25,28 +25,26 @@ class NCILogin(Resource):
     self.route('GET', ('loginCallback',), self.loginCallback)
     self.route('GET', ('callback',), self.callback)
     self.route('GET', ('CIloginCallback',), self.cilogin)
-    self.route('GET', ('CIloginUser',), self.ciloginUser)
 
   @access.public
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
   def cilogin(self):
-    import os
-    d = os.environ
-    k = d.keys()
-    k.sort()
-    print 'a'
-    for item in k:
-       print item, d[item]
-  @access.public
-  @autoDescribeRoute(
-    Description('GET Current NIH Login url.'))
-  def ciloginUser(self):
-    data = {'access_token': '6b27c71ae7ba97a725a4696f39b8fa8d'}
-    response = requests.post('https://cilogon.org/oauth2/userinfo', data)
-    print response.content
-    print response.status_code
+    code = cherrypy.request.params['code']
+    data = {'grant_type': 'authorization_code',
+            'code': code,
+            'client_id': 'cilogon:/client_id/349f62572450441b8208c692ece2fdf8',
+            'client_secret': 'EHnJeYHJTx542N7ZL2Cs2QjXJn86SdPF-W699zVzH55gSQi-JDXOXQBkxIcuF74R4_A_L7jqNebs23S4Yh2-Vw',
+            'redirect_uri': 'https://fr-s-ivg-ssr-d1.ncifcrf.gov/api/v1/nciLogin/CIloginCallback'
+          }
+    res = requests.post('https://cilogon.org/oauth2/token', data)
+    id_token = res.content['id_token']
+    access_token = res.content['access_token']
 
+    data = {'access_token': access_token}
+    userinfo = requests.post('https://cilogon.org/oauth2/userinfo', data)
+
+    print userinfo
   @access.public
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
