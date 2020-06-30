@@ -38,7 +38,7 @@ class NCILogin(Resource):
             'client_secret': 'EHnJeYHJTx542N7ZL2Cs2QjXJn86SdPF-W699zVzH55gSQi-JDXOXQBkxIcuF74R4_A_L7jqNebs23S4Yh2-Vw',
             'redirect_uri': 'https://fr-s-ivg-ssr-d1.ncifcrf.gov/api/v1/nciLogin/CIloginCallback'
           }
-    res = json.load(requests.post('https://cilogon.org/oauth2/token', data))
+    res = json.loads(requests.post('https://cilogon.org/oauth2/token', data))
     id_token = res.content['id_token']
     access_token = res.content['access_token']
 
