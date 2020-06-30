@@ -103,7 +103,8 @@ class NCILogin(Resource):
   def loginCallback(self):
     url = Setting().get(constants.PluginSettings.NCI_API_URL)
     if Setting().get(constants.PluginSettings.PROVIDERS_ENABLED):
-      return Setting().get('NCIAuth.NCI_login_url') + '?returnUrl=' + '/'.join((url, 'nciLogin', 'callback'))
+      return 'https://cilogon.org/authorize/?response_type=code&scope=openid%20email%20profile&client_id=cilogon:/client_id/349f62572450441b8208c692ece2fdf8&state=h4u9b4D-0ogWpAD_j-g3hc7bVyE&redirect_uri=https://fr-s-ivg-ssr-d1.ncifcrf.gov/api/v1/nciLogin/CIloginCallback&nonce=Dc8IwccBQAKR8bwHtIXgcXmluSGky8-_fs4MG0Z6Md0'
+      # return Setting().get('NCIAuth.NCI_login_url') + '?returnUrl=' + '/'.join((url, 'nciLogin', 'callback'))
     else:
       return []
   @access.public
