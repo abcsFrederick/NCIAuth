@@ -23,12 +23,19 @@ var ConfigView = View.extend({
                 key: 'NCIAuth.' + providerId + '_return_url',
                 value: this.$('#g-oauth-provider-' + providerId + '-return-url').val().trim()
             }, {
-                key: 'NCIAuth.' + providerId + '_login_url',
-                value: this.$('#g-oauth-provider-' + providerId + '-login-url').val().trim()
+                key: 'NCIAuth.' + providerId + '_client_id',
+                value: this.$('#g-oauth-provider-' + providerId + '-client-id').val().trim()
             }, {
-                key: 'NCIAuth.' + providerId + '_validation_url',
-                value: this.$('#g-oauth-provider-' + providerId + '-validation-url').val().trim()
+                key: 'NCIAuth.' + providerId + '_client_secret',
+                value: this.$('#g-oauth-provider-' + providerId + '-client-secret').val().trim()
             }]);
+            //    {
+            //     key: 'NCIAuth.' + providerId + '_login_url',
+            //     value: this.$('#g-oauth-provider-' + providerId + '-login-url').val().trim()
+            // }, {
+            //     key: 'NCIAuth.' + providerId + '_validation_url',
+            //     value: this.$('#g-oauth-provider-' + providerId + '-validation-url').val().trim()
+            // }]);
         },
 
         'change .g-ignore-registration-policy': function (event) {
@@ -64,8 +71,10 @@ var ConfigView = View.extend({
         _.each(this.providerIds, function (id) {
             settingKeys.push('NCIAuth.' + id + '_api_url');
             settingKeys.push('NCIAuth.' + id + '_return_url');
-            settingKeys.push('NCIAuth.' + id + '_login_url');
-            settingKeys.push('NCIAuth.' + id + '_validation_url');
+            settingKeys.push('NCIAuth.' + id + '_client_id');
+            settingKeys.push('NCIAuth.' + id + '_client_secret');
+            // settingKeys.push('NCIAuth.' + id + '_login_url');
+            // settingKeys.push('NCIAuth.' + id + '_validation_url');
         }, this);
 
         restRequest({
@@ -108,10 +117,14 @@ var ConfigView = View.extend({
                     this.settingVals['NCIAuth.' + id + '_api_url']);
                 this.$('#g-oauth-provider-' + id + '-return-url').val(
                     this.settingVals['NCIAuth.' + id + '_return_url']);
-                this.$('#g-oauth-provider-' + id + '-login-url').val(
-                    this.settingVals['NCIAuth.' + id + '_login_url']);
-                this.$('#g-oauth-provider-' + id + '-validation-url').val(
-                    this.settingVals['NCIAuth.' + id + '_validation_url']);
+                this.$('#g-oauth-provider-' + id + '-client-id').val(
+                    this.settingVals['NCIAuth.' + id + '_client_id']);
+                this.$('#g-oauth-provider-' + id + '-client-secret').val(
+                    this.settingVals['NCIAuth.' + id + '_client_secret']);
+                // this.$('#g-oauth-provider-' + id + '-login-url').val(
+                //     this.settingVals['NCIAuth.' + id + '_login_url']);
+                // this.$('#g-oauth-provider-' + id + '-validation-url').val(
+                //     this.settingVals['NCIAuth.' + id + '_validation_url']);
             }, this);
 
             var checked = this.settingVals['NCIAuth.ignore_registration_policy'];

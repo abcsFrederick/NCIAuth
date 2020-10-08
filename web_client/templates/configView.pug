@@ -11,21 +11,26 @@
       input.g-ignore-registration-policy(type="checkbox")
       | Ignore closed registration policy
 
-.g-oauth-provider-list-title Configure NCI DMS solution below
+//- .g-oauth-provider-list-title Configure NCI DMS solution below
+.g-oauth-provider-list-title Configure CILogon
 
 #g-oauth-provider-accordion.panel-group
   .g-oauth-value-container
     form.g-oauth-provider-form(role="form",
               id=`g-oauth-provider-NCI-form`, provider-id='NCI')
       .form-group
-        label.control-label(for=`g-oauth-provider-NCI-client-id`) Return URL
+        //- label.control-label(for=`g-oauth-provider-NCI-client-id`) Return URL
+        input.input-sm.form-control(id=`g-oauth-provider-NCI-client-id`,
+            type="text", placeholder="CILogon Client Id" required)
+        input.input-sm.form-control(id=`g-oauth-provider-NCI-client-secret`,
+            type="text", placeholder="CILogon Client Secret" required)
         input.input-sm.form-control(id=`g-oauth-provider-NCI-api-url`,
             type="text", placeholder="API URL" required)
         input.input-sm.form-control(id=`g-oauth-provider-NCI-return-url`,
             type="text", placeholder="Return URL" required)
-        input.input-sm.form-control(id=`g-oauth-provider-NCI-login-url`,
-            type="text", placeholder="Login URL" required)
-        input.input-sm.form-control(id=`g-oauth-provider-NCI-validation-url`,
-            type="text", placeholder="Validation URL" required)
+        //- input.input-sm.form-control(id=`g-oauth-provider-NCI-login-url`,
+        //-     type="text", placeholder="Login URL" required)
+        //- input.input-sm.form-control(id=`g-oauth-provider-NCI-validation-url`,
+        //-     type="text", placeholder="Validation URL" required)
         p.g-validation-failed-message(id=`g-oauth-provider-NCI-error-message`)
         input.btn.btn-sm.btn-primary(type="submit", value="Save", provider-id='NCI')

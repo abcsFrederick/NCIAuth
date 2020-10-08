@@ -24,7 +24,8 @@ class PluginSettings(object):
     IGNORE_REGISTRATION_POLICY = 'NCIAuth.ignore_registration_policy'
 
     NCI_CLIENT_ID = 'NCIAuth.NCI_client_id'
+    NCI_CLIENT_SECRET = 'NCIAuth.NCI_client_secret'
     NCI_RETURN_URL = 'NCIAuth.NCI_return_url'
     NCI_API_URL = 'NCIAuth.NCI_api_url'
-    NCI_LOGIN_URL = 'NCIAuth.NCI_login_url'
-    NCI_VALIDATION_URL = 'NCIAuth.NCI_validation_url'
+    # NCI_LOGIN_URL = 'NCIAuth.NCI_login_url'
+    # NCI_VALIDATION_URL = 'NCIAuth.NCI_validation_url'

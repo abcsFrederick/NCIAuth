@@ -24,7 +24,7 @@ class NCILogin(Resource):
     self.resourceName = 'nciLogin'
 
     self.route('GET', ('loginCallback',), self.loginCallback)
-    self.route('GET', ('callback',), self.callback)
+    # self.route('GET', ('callback',), self.callback)
     self.route('GET', ('CIloginCallback',), self.cilogin)
 
   @access.public
@@ -34,9 +34,9 @@ class NCILogin(Resource):
     code = cherrypy.request.params['code']
     data = {'grant_type': 'authorization_code',
             'code': code,
-            'client_id': 'cilogon:/client_id/21b3f7acd259afd57d80b831e4ef729d',
-            'client_secret': 'B4VhyuLEINazuL2RJFdkc6M2LTPmPmSwR-81r16udSHbLgJM_fwiPZg9MifbEACCcM44MwkhJzLHZ6Aerpk9nw',
-            'redirect_uri': 'https://fr-s-ivg-ssr-p1.ncifcrf.gov/api/v1/nciLogin/CIloginCallback'
+            'client_id': 'cilogon:/client_id/' + Setting().get('NCIAuth.NCI_client_id'), # 21b3f7acd259afd57d80b831e4ef729d
+            'client_secret': Setting().get('NCIAuth.NCI_client_secret') # 'B4VhyuLEINazuL2RJFdkc6M2LTPmPmSwR-81r16udSHbLgJM_fwiPZg9MifbEACCcM44MwkhJzLHZ6Aerpk9nw',
+            'redirect_uri': Setting().get('NCIAuth.NCI_api_url') + '/nciLogin/CIloginCallback'
           }
     res = json.loads(requests.post('https://cilogon.org/oauth2/token', data).content)
     id_token = res['id_token']
@@ -63,7 +63,7 @@ class NCILogin(Resource):
           raise RestException(
             'Registration on this instance is closed. Contact an '
             'administrator to create an account for you.')
-      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName,NCIid)
+      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, NCIid)
       user = User().createUser(
         login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
     else:
@@ -103,7 +103,12 @@ class NCILogin(Resource):
   def loginCallback(self):
     url = Setting().get(constants.PluginSettings.NCI_API_URL)
     if Setting().get(constants.PluginSettings.PROVIDERS_ENABLED):
-      return 'https://cilogon.org/authorize/?response_type=code&scope=openid%20email%20profile&client_id=cilogon:/client_id/21b3f7acd259afd57d80b831e4ef729d&state=h4u9b4D-0ogWpAD_j-g3hc7bVyE&redirect_uri=https://fr-s-ivg-ssr-p1.ncifcrf.gov/api/v1/nciLogin/CIloginCallback&skin=nih'
+      return 'https://cilogon.org/authorize/?'
+             'response_type=code&scope=openid%20email%20profile'
+             '&client_id=cilogon:/client_id/' + Setting().get('NCIAuth.NCI_client_id') + 
+             '&state=h4u9b4D-0ogWpAD_j-g3hc7bVyE'
+             '&redirect_uri=https://fr-s-ivg-ssr-p1.ncifcrf.gov/api/v1/nciLogin/CIloginCallback'
+             '&skin=nih'
       # return Setting().get('NCIAuth.NCI_login_url') + '?returnUrl=' + '/'.join((url, 'nciLogin', 'callback'))
     else:
       return []
@@ -111,6 +116,8 @@ class NCILogin(Resource):
   @autoDescribeRoute(
     Description('API Endpoint for users in the NCI account.'))
   # @classmethod
+  # DMS method
+  '''
   def callback(self):
     # print cherrypy.request.params['token']
     token = cherrypy.request.params['token']
@@ -172,14 +179,14 @@ class NCILogin(Resource):
 
     raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
 
-    '''
-    try:
-      redirect = redirect.format(girderToken=str(girderToken['_id']))
-    except KeyError:
-      pass  # in case there's another {} that's not handled by format
+    # try:
+    #   redirect = redirect.format(girderToken=str(girderToken['_id']))
+    # except KeyError:
+    #   pass  # in case there's another {} that's not handled by format
 
-    raise cherrypy.HTTPRedirect(redirect)
-    '''
+    # raise cherrypy.HTTPRedirect(redirect)
+
+  '''
   @classmethod
   def _deriveLogin(self, email, firstName, lastName, userName=None):
     """
