@@ -101,23 +101,24 @@ class NCILogin(Resource):
     Description('GET Current NIH Login url.'))
 
   def loginCallback(self):
-    url = Setting().get(constants.PluginSettings.NCI_API_URL)
+    api_url = Setting().get(constants.PluginSettings.NCI_API_URL)
     if Setting().get(constants.PluginSettings.PROVIDERS_ENABLED):
-      return 'https://cilogon.org/authorize/?' +
-             'response_type=code&scope=openid%20email%20profile' +
-             '&client_id=cilogon:/client_id/' + Setting().get('NCIAuth.NCI_client_id') +
-             '&state=h4u9b4D-0ogWpAD_j-g3hc7bVyE' +
-             '&redirect_uri=https://fr-s-ivg-ssr-p1.ncifcrf.gov/api/v1/nciLogin/CIloginCallback' +
-             '&skin=nih'
+      callbackUrl = "https://cilogon.org/authorize/?" \
+      "response_type=code&scope=openid%20email%20profile" \
+      "&client_id=cilogon:/client_id/{}" \
+      "&state=h4u9b4D-0ogWpAD_j-g3hc7bVyE" \
+      "&redirect_uri={}/nciLogin/CIloginCallback" \
+      "&skin=nih".format(Setting().get('NCIAuth.NCI_client_id'), api_url)
+      return callbackUrl
       # return Setting().get('NCIAuth.NCI_login_url') + '?returnUrl=' + '/'.join((url, 'nciLogin', 'callback'))
     else:
       return []
   @access.public
   @autoDescribeRoute(
     Description('API Endpoint for users in the NCI account.'))
+
   # @classmethod
   # DMS method
-  '''
   def callback(self):
     # print cherrypy.request.params['token']
     token = cherrypy.request.params['token']
@@ -186,7 +187,6 @@ class NCILogin(Resource):
 
     # raise cherrypy.HTTPRedirect(redirect)
 
-  '''
   @classmethod
   def _deriveLogin(self, email, firstName, lastName, userName=None):
     """

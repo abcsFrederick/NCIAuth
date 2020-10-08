@@ -14,10 +14,11 @@ def validateIgnoreRegistrationPolicy(doc):
         raise ValidationException('Ignore registration policy setting must be boolean.', 'value')
 @setting_utilities.validator({
     constants.PluginSettings.NCI_CLIENT_ID,
+    constants.PluginSettings.NCI_CLIENT_SECRET,
     constants.PluginSettings.NCI_API_URL,
     constants.PluginSettings.NCI_RETURN_URL,
-    constants.PluginSettings.NCI_LOGIN_URL,
-    constants.PluginSettings.NCI_VALIDATION_URL
+    # constants.PluginSettings.NCI_LOGIN_URL,
+    # constants.PluginSettings.NCI_VALIDATION_URL
 })
 def validateOtherSettings(event):
     pass
