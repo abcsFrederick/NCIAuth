@@ -24,4 +24,4 @@ Refresh Tokens: No
 
 After you have client Id and secret (recommand to save it somewhere), go to https://fr-s-your-server/#plugins/NCIAuth/config to fill and save configuration.
 
-If you use `LoginView` that provides by girder, you will see the NCI logo for clicking and sign-in.
+If you use [LoginView](https://github.com/girder/girder/blob/2.x-maintenance/clients/web/src/views/layout/LoginView.js) that provides by girder, you will see the NCI logo for clicking and sign-in.
