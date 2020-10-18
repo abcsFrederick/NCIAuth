@@ -28,7 +28,7 @@ setup(
     keywords='girder-plugin, nciauth_girder3',
     name='nciauth_girder3',
     packages=find_packages(exclude=['test', 'test.*']),
-    url='http://www.knowledgevis.com',
+    url='https://github.com/knowledgevis/NCIAuth-girder3',
     version='0.1.0',
     zip_safe=False,
     entry_points={
