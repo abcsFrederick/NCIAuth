@@ -1,0 +1,5 @@
+pip>=9
+tox
+virtualenv
+requests
+requests-ntlm
