@@ -65,7 +65,7 @@ class NCILogin(Resource):
             'administrator to create an account for you.')
       login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, NCIid)
       user = User().createUser(
-        login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
+        login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail[:NCIemail.index('@')])
     else:
       # Migrate from a legacy format where only 1 provider was stored
       if isinstance(user.get('oauth'), dict):
@@ -221,7 +221,7 @@ class NCILogin(Resource):
     # If they have a username on the other service, try that
     if userName:
       yield userName
-      userName = re.sub('[\W_]+', '', userName)
+      userName = re.sub(r'[\W_]+', '', userName)
       yield userName
 
       for i in range(1, 6):
@@ -230,7 +230,7 @@ class NCILogin(Resource):
     # Next try to use the prefix from their email address
     prefix = email.split('@')[0]
     yield prefix
-    yield re.sub('[\W_]+', '', prefix)
+    yield re.sub(r'[\W_]+', '', prefix)
 
     # Finally try to use their first and last name
     yield '%s%s' % (firstName, lastName)
@@ -244,7 +244,11 @@ class NCILogin(Resource):
     When attempting to generate a username, use this to test if the given
     name is valid.
     """
-    regex = config.getConfig()['users']['login_regex']
+    try:
+      User()._validateLogin(login)
+    except ValidationException:
+      # Still doesn't match regex, we're hosed
+      return False
 
     # Still doesn't match regex, we're hosed
     if not re.match(regex, login):
@@ -253,5 +257,5 @@ class NCILogin(Resource):
     # See if this is already taken.
     user = User().findOne({'login': login})
 
-    return not user   
+    return not user
 
