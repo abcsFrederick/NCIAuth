@@ -12,7 +12,7 @@ from girder.models.user import User
 from girder.models.setting import Setting
 from girder.exceptions import RestException
 from girder.api.rest import Resource, getApiUrl
-#from girder.constants import SettingKey
+from girder.settings import SettingKey
 from girder.utility import config
 from . import constants
 
