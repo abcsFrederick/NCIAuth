@@ -2,7 +2,7 @@ from girder.api.rest import Resource,boundHandler
 from girder.api.describe import Description, autoDescribeRoute
 from girder.api import access
 import cherrypy
-from .DMSAuth import DMSAuthentication
+# from .DMSAuth import DMSAuthentication
 import re
 import requests
 import json
@@ -113,79 +113,79 @@ class NCILogin(Resource):
       # return Setting().get('NCIAuth.NCI_login_url') + '?returnUrl=' + '/'.join((url, 'nciLogin', 'callback'))
     else:
       return []
-  @access.public
-  @autoDescribeRoute(
-    Description('API Endpoint for users in the NCI account.'))
+  # @access.public
+  # @autoDescribeRoute(
+  #   Description('API Endpoint for users in the NCI account.'))
 
   # @classmethod
   # DMS method
-  def callback(self):
-    # print cherrypy.request.params['token']
-    token = cherrypy.request.params['token']
+  # def callback(self):
+  #   # print cherrypy.request.params['token']
+  #   token = cherrypy.request.params['token']
 
-    validation = DMSAuthentication("ncifivgSvc","+vYg<^Y|#4w:r9)",2)
-    userInfo=validation.validateToken(token)
+  #   validation = DMSAuthentication("ncifivgSvc","+vYg<^Y|#4w:r9)",2)
+  #   userInfo=validation.validateToken(token)
 
-    #validation with service 
-    NCIemail = userInfo["email"]
-    NCIfirstName = userInfo["first_name"]
-    NCIlastName = userInfo["last_name"]
-    NCIid = userInfo["userID"]
+  #   #validation with service 
+  #   NCIemail = userInfo["email"]
+  #   NCIfirstName = userInfo["first_name"]
+  #   NCIlastName = userInfo["last_name"]
+  #   NCIid = userInfo["userID"]
 
     
-    user = User().findOne({'email': NCIemail})
+  #   user = User().findOne({'email': NCIemail})
 
-    setId = not user
-    dirty = False
-    if not user:
-      policy = Setting().get(SettingKey.REGISTRATION_POLICY)
+  #   setId = not user
+  #   dirty = False
+  #   if not user:
+  #     policy = Setting().get(SettingKey.REGISTRATION_POLICY)
 
-      if policy == 'closed':
-        ignore = Setting().get(PluginSettings.IGNORE_REGISTRATION_POLICY)
-        if not ignore:
-          raise RestException(
-            'Registration on this instance is closed. Contact an '
-            'administrator to create an account for you.')
-      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName,NCIid)
+  #     if policy == 'closed':
+  #       ignore = Setting().get(PluginSettings.IGNORE_REGISTRATION_POLICY)
+  #       if not ignore:
+  #         raise RestException(
+  #           'Registration on this instance is closed. Contact an '
+  #           'administrator to create an account for you.')
+  #     login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName,NCIid)
 
-      user = User().createUser(
-        login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
-    else:
-      # Migrate from a legacy format where only 1 provider was stored
-      if isinstance(user.get('oauth'), dict):
-        user['oauth'] = [user['oauth']]
-        dirty = True
-      # Update user data from provider
-      if NCIemail != user['email']:
-        user['email'] = NCIemail
-        dirty = True
-      # Don't set names to empty string
-      if NCIfirstName != user['firstName'] and NCIfirstName:
-        user['firstName'] = NCIfirstName
-        dirty = True
-      if NCIlastName != user['lastName'] and NCIlastName:
-        user['lastName'] = NCIlastName
-        dirty = True
+  #     user = User().createUser(
+  #       login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
+  #   else:
+  #     # Migrate from a legacy format where only 1 provider was stored
+  #     if isinstance(user.get('oauth'), dict):
+  #       user['oauth'] = [user['oauth']]
+  #       dirty = True
+  #     # Update user data from provider
+  #     if NCIemail != user['email']:
+  #       user['email'] = NCIemail
+  #       dirty = True
+  #     # Don't set names to empty string
+  #     if NCIfirstName != user['firstName'] and NCIfirstName:
+  #       user['firstName'] = NCIfirstName
+  #       dirty = True
+  #     if NCIlastName != user['lastName'] and NCIlastName:
+  #       user['lastName'] = NCIlastName
+  #       dirty = True
 
-    if setId:
-      user.setdefault('NCI_credential', []).append(
-        {
-          'provider': 'NCI'
-        })
-      dirty = True
-    if dirty:
-      user = User().save(user)
+  #   if setId:
+  #     user.setdefault('NCI_credential', []).append(
+  #       {
+  #         'provider': 'NCI'
+  #       })
+  #     dirty = True
+  #   if dirty:
+  #     user = User().save(user)
 
-    girderToken = self.sendAuthTokenCookie(user)
+  #   girderToken = self.sendAuthTokenCookie(user)
 
-    raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
+  #   raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
 
-    # try:
-    #   redirect = redirect.format(girderToken=str(girderToken['_id']))
-    # except KeyError:
-    #   pass  # in case there's another {} that's not handled by format
+  #   # try:
+  #   #   redirect = redirect.format(girderToken=str(girderToken['_id']))
+  #   # except KeyError:
+  #   #   pass  # in case there's another {} that's not handled by format
 
-    # raise cherrypy.HTTPRedirect(redirect)
+  #   # raise cherrypy.HTTPRedirect(redirect)
 
   @classmethod
   def _deriveLogin(self, email, firstName, lastName, userName=None):
