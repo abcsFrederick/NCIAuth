@@ -250,10 +250,6 @@ class NCILogin(Resource):
       # Still doesn't match regex, we're hosed
       return False
 
-    # Still doesn't match regex, we're hosed
-    if not re.match(regex, login):
-      return False
-
     # See if this is already taken.
     user = User().findOne({'login': login})
 
