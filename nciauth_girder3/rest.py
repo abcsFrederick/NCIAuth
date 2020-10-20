@@ -23,33 +23,39 @@ class NCILogin(Resource):
     super(NCILogin, self).__init__()
     self.resourceName = 'nciLogin'
 
-    self.route('GET', ('loginCallback',), self.loginCallback)
+    self.route('GET', ('endpoint',), self.getEndpoint)
     # self.route('GET', ('callback',), self.callback)
-    self.route('GET', ('CIloginCallback',), self.cilogin)
+    self.route('GET', ('loginCallback',), self.login)
 
   @access.public
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
-  def cilogin(self):
+  def login(self):
+    # https://stsstg.nih.gov/ dev
+    # https://sts.nih.gov/ pro
+    print(cherrypy.request.params)
     code = cherrypy.request.params['code']
     data = {'grant_type': 'authorization_code',
             'code': code,
-            'client_id': 'cilogon:/client_id/' + Setting().get('NCIAuth.NCI_client_id'), # 21b3f7acd259afd57d80b831e4ef729d
-            'client_secret': Setting().get('NCIAuth.NCI_client_secret'), # 'B4VhyuLEINazuL2RJFdkc6M2LTPmPmSwR-81r16udSHbLgJM_fwiPZg9MifbEACCcM44MwkhJzLHZ6Aerpk9nw',
-            'redirect_uri': Setting().get('NCIAuth.NCI_api_url') + '/nciLogin/CIloginCallback'
+            # 'client_id': 'cilogon:/client_id/' + Setting().get('NCIAuth.NCI_client_id'),
+            'client_id': Setting().get('NCIAuth.NCI_client_id'),
+            'client_secret': Setting().get('NCIAuth.NCI_client_secret'),
+            'redirect_uri': Setting().get('NCIAuth.NCI_api_url') + '/nciLogin/loginCallback'
           }
-    res = json.loads(requests.post('https://cilogon.org/oauth2/token', data).content)
+    # res = json.loads(requests.post('https://cilogon.org/oauth2/token', data).content) # /auth/oauth/v2/token
+    res = json.loads(requests.post('https://stsstg.nih.gov/auth/oauth/v2/token', data).content)
+
     id_token = res['id_token']
     access_token = res['access_token']
-
+    expire = res["expires_in"]
     data = {'access_token': access_token}
-    userinfo = requests.post('https://cilogon.org/oauth2/userinfo', data)
-
+    userinfo = requests.post('https://stsstg.nih.gov/openid/connect/v1/userinfo', data)
+    # userinfo = requests.post('https://cilogon.org/oauth2/userinfo', data) # /openid/connect/v1/userinfo
     user = json.loads(userinfo.content)
     NCIemail = user["email"]
-    NCIfirstName = user["given_name"]
-    NCIlastName = user["family_name"]
-
+    NCIfirstName = user["first_name"]
+    NCIlastName = user["last_name"]
+    NCIUsername = user["userid"]
     user = User().findOne({'email': NCIemail})
 
     setId = not user
@@ -63,7 +69,7 @@ class NCILogin(Resource):
           raise RestException(
             'Registration on this instance is closed. Contact an '
             'administrator to create an account for you.')
-      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, NCIemail[:NCIemail.index('@')])
+      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, userName=NCIUsername)
       user = User().createUser(
         login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
     else:
@@ -91,7 +97,7 @@ class NCILogin(Resource):
         dirty = True
       if dirty:
         user = User().save(user)
-
+    print(user)
     girderToken = self.sendAuthTokenCookie(user)
 
     raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
@@ -100,16 +106,22 @@ class NCILogin(Resource):
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
 
-  def loginCallback(self):
+  def getEndpoint(self):
     api_url = Setting().get(constants.PluginSettings.NCI_API_URL)
     if Setting().get(constants.PluginSettings.PROVIDERS_ENABLED):
-      callbackUrl = "https://cilogon.org/authorize/?" \
-      "response_type=code&scope=openid%20email%20profile" \
-      "&client_id=cilogon:/client_id/{}" \
-      "&state=h4u9b4D-0ogWpAD_j-g3hc7bVyE" \
-      "&redirect_uri={}/nciLogin/CIloginCallback" \
-      "&skin=nih".format(Setting().get('NCIAuth.NCI_client_id'), api_url)
-      return callbackUrl
+      # callbackUrl = "https://cilogon.org/authorize/?" \
+      # "response_type=code&scope=openid%20email%20profile" \
+      # "&client_id=cilogon:/client_id/{}" \
+      # "&state=h4u9b4D-0ogWpAD_j-g3hc7bVyE" \
+      # "&redirect_uri={}/nciLogin/CIloginCallback" \
+      # "&skin=nih".format(Setting().get('NCIAuth.NCI_client_id'), api_url)
+      
+      authorization_endpoint = 'https://stsstg.nih.gov/auth/oauth/v2/authorize?' \
+      'client_id={}' \
+      '&response_type=code' \
+      '&redirect_uri={}/nciLogin/loginCallback' \
+      '&scope=phone+email+profile+openid'.format(Setting().get('NCIAuth.NCI_client_id'), api_url)
+      return authorization_endpoint
       # return Setting().get('NCIAuth.NCI_login_url') + '?returnUrl=' + '/'.join((url, 'nciLogin', 'callback'))
     else:
       return []
@@ -123,8 +135,8 @@ class NCILogin(Resource):
   #   # print cherrypy.request.params['token']
   #   token = cherrypy.request.params['token']
 
-  #   validation = DMSAuthentication("ncifivgSvc","+vYg<^Y|#4w:r9)",2)
-  #   userInfo=validation.validateToken(token)
+  #   validation = DMSAuthentication("ncifivgSvc", "%/2L4?*Q&{rQ3g~", 2)
+  #   userInfo = validation.validateToken(token)
 
   #   #validation with service 
   #   NCIemail = userInfo["email"]

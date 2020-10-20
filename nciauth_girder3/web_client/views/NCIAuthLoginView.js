@@ -25,7 +25,7 @@ var NCIAuthLoginView = View.extend({
 
         restRequest({
             method: 'GET',
-            url: 'nciLogin/loginCallback',
+            url: 'nciLogin/endpoint',
         }).done(_.bind((res)=>{
             if(res.length){
                 this.providers = [{
