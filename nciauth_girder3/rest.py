@@ -34,8 +34,8 @@ class NCILogin(Resource):
     code = cherrypy.request.params['code']
     data = {'grant_type': 'authorization_code',
             'code': code,
-            'client_id': 'cilogon:/client_id/' + Setting().get('NCIAuth.NCI_client_id'), # 21b3f7acd259afd57d80b831e4ef729d
-            'client_secret': Setting().get('NCIAuth.NCI_client_secret'), # 'B4VhyuLEINazuL2RJFdkc6M2LTPmPmSwR-81r16udSHbLgJM_fwiPZg9MifbEACCcM44MwkhJzLHZ6Aerpk9nw',
+            'client_id': 'cilogon:/client_id/' + Setting().get('NCIAuth.NCI_client_id'),
+            'client_secret': Setting().get('NCIAuth.NCI_client_secret'),
             'redirect_uri': Setting().get('NCIAuth.NCI_api_url') + '/nciLogin/CIloginCallback'
           }
     res = json.loads(requests.post('https://cilogon.org/oauth2/token', data).content)
