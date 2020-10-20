@@ -92,9 +92,9 @@ class NCILogin(Resource):
       if dirty:
         user = User().save(user)
 
-      girderToken = self.sendAuthTokenCookie(user)
+    girderToken = self.sendAuthTokenCookie(user)
 
-      raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
+    raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
 
   @access.public
   @autoDescribeRoute(
