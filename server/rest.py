@@ -63,7 +63,7 @@ class NCILogin(Resource):
           raise RestException(
             'Registration on this instance is closed. Contact an '
             'administrator to create an account for you.')
-      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, NCIid)
+      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, NCIemails[:s.index('@')])
       user = User().createUser(
         login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
     else:
@@ -92,9 +92,9 @@ class NCILogin(Resource):
       if dirty:
         user = User().save(user)
 
-      girderToken = self.sendAuthTokenCookie(user)
+    girderToken = self.sendAuthTokenCookie(user)
 
-      raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
+    raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
 
   @access.public
   @autoDescribeRoute(
