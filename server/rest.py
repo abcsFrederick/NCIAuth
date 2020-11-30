@@ -31,9 +31,10 @@ class NCILogin(Resource):
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
   def cilogin(self):
+    print cherrypy.request.params
     code = cherrypy.request.params['code']
     data = {'grant_type': 'authorization_code',
-            'code': code,
+            # 'code': code,
             'client_id': 'cilogon:/client_id/' + Setting().get('NCIAuth.NCI_client_id'), # 21b3f7acd259afd57d80b831e4ef729d
             'client_secret': Setting().get('NCIAuth.NCI_client_secret'), # 'B4VhyuLEINazuL2RJFdkc6M2LTPmPmSwR-81r16udSHbLgJM_fwiPZg9MifbEACCcM44MwkhJzLHZ6Aerpk9nw',
             'redirect_uri': Setting().get('NCIAuth.NCI_api_url') + '/nciLogin/CIloginCallback'
@@ -104,7 +105,7 @@ class NCILogin(Resource):
     api_url = Setting().get(constants.PluginSettings.NCI_API_URL)
     if Setting().get(constants.PluginSettings.PROVIDERS_ENABLED):
       callbackUrl = "https://cilogon.org/authorize/?" \
-      "response_type=code&scope=openid%20email%20profile" \
+      "response_type=code&scope=openid%20email%20profile%20org.cilogon.userinfo" \
       "&client_id=cilogon:/client_id/{}" \
       "&state=h4u9b4D-0ogWpAD_j-g3hc7bVyE" \
       "&redirect_uri={}/nciLogin/CIloginCallback" \
