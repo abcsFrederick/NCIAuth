@@ -63,7 +63,7 @@ class NCILogin(Resource):
           raise RestException(
             'Registration on this instance is closed. Contact an '
             'administrator to create an account for you.')
-      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, NCIemail[:s.index('@')])
+      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, NCIemail[:NCIemail.index('@')])
       user = User().createUser(
         login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
     else:
