@@ -31,6 +31,7 @@ class NCILogin(Resource):
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
   def cilogin(self):
+    print '---------------------'
     print cherrypy.request.params
     code = cherrypy.request.params['code']
     data = {'grant_type': 'authorization_code',
