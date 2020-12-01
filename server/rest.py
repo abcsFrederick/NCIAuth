@@ -31,8 +31,6 @@ class NCILogin(Resource):
   @autoDescribeRoute(
     Description('GET Current NIH Login url.'))
   def cilogin(self):
-    print '---------------------'
-    print cherrypy.request.params
     code = cherrypy.request.params['code']
     data = {'grant_type': 'authorization_code',
             'code': code,
@@ -95,7 +93,6 @@ class NCILogin(Resource):
         user = User().save(user)
 
     girderToken = self.sendAuthTokenCookie(user)
-    print 'redirect======'
     raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
 
   @access.public
