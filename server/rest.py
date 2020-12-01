@@ -95,7 +95,7 @@ class NCILogin(Resource):
         user = User().save(user)
 
     girderToken = self.sendAuthTokenCookie(user)
-
+    print 'redirect======'
     raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
 
   @access.public
