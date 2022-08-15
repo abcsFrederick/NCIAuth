@@ -1,0 +1,12 @@
+.g-oauth-container
+  .g-oauth-section-header
+    .g-oauth-section-header-text
+      if enablePasswordLogin
+        | Or #{modeText} with
+      else
+        | Log in with
+  each button in buttons
+    .g-oauth-button-NCI(class=button.class, g-provider=button.providerId)
+      .g-oauth-button-icon
+        img(style='width:100%' src='https://www.nih.gov/sites/default/files/styles/sidebar_media_breakpoint-large/public/about-nih/2012-logo.png?itok=mbDiPS4M')
+      //- .g-oauth-button-text= button.text || button.providerId
