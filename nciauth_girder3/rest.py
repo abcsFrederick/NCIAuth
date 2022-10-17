@@ -10,7 +10,7 @@ import json
 from girder import events
 from girder.models.user import User
 from girder.models.setting import Setting
-from girder.exceptions import RestException
+from girder.exceptions import RestException, ValidationException
 from girder.api.rest import Resource, getApiUrl
 from girder.settings import SettingKey
 from girder.utility import config
@@ -52,11 +52,12 @@ class NCILogin(Resource):
     userinfo = requests.post('https://stsstg.nih.gov/openid/connect/v1/userinfo', data)
     # userinfo = requests.post('https://cilogon.org/oauth2/userinfo', data) # /openid/connect/v1/userinfo
     user = json.loads(userinfo.content)
-    NCIemail = user["email"]
-    NCIfirstName = user["first_name"]
-    NCIlastName = user["last_name"]
-    NCIUsername = user["userid"]
-    user = User().findOne({'email': NCIemail})
+
+    email = user["email"]
+    firstName = user["first_name"]
+    lastName = user["last_name"]
+    username = user["userid"]
+    user = User().findOne({'email': email})
 
     setId = not user
     dirty = False
@@ -69,24 +70,24 @@ class NCILogin(Resource):
           raise RestException(
             'Registration on this instance is closed. Contact an '
             'administrator to create an account for you.')
-      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, userName=NCIUsername)
+      login = self._deriveLogin(email, firstName, lastName, userName=username)
       user = User().createUser(
-        login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
+        login=login, password=None, firstName=firstName, lastName=lastName, email=email)
     else:
       # Migrate from a legacy format where only 1 provider was stored
       if isinstance(user.get('oauth'), dict):
         user['oauth'] = [user['oauth']]
         dirty = True
       # Update user data from provider
-      if NCIemail != user['email']:
-        user['email'] = NCIemail
+      if email != user['email']:
+        user['email'] = email
         dirty = True
       # Don't set names to empty string
-      if NCIfirstName != user['firstName'] and NCIfirstName:
-        user['firstName'] = NCIfirstName
+      if firstName != user['firstName'] and firstName:
+        user['firstName'] = firstName
         dirty = True
-      if NCIlastName != user['lastName'] and NCIlastName:
-        user['lastName'] = NCIlastName
+      if lastName != user['lastName'] and lastName:
+        user['lastName'] = lastName
         dirty = True
 
       if setId:
@@ -97,7 +98,7 @@ class NCILogin(Resource):
         dirty = True
       if dirty:
         user = User().save(user)
-    print(user)
+
     girderToken = self.sendAuthTokenCookie(user)
 
     raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
@@ -215,7 +216,6 @@ class NCILogin(Resource):
     # as many OAuth2 services consider that to be private data
 
     for login in self._generateLogins(email, firstName, lastName, userName):
-
       login = login.lower()
 
       if self._testLogin(login):

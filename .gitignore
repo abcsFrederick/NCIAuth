@@ -43,7 +43,7 @@ coverage.xml
 
 # dotenv
 .env
-
+.env.ncilogin
 # virtualenv
 .venv
 venv/
