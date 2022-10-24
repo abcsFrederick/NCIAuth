@@ -12,6 +12,7 @@ from girder.models.user import User
 from girder.models.setting import Setting
 from girder.exceptions import RestException, ValidationException
 from girder.api.rest import Resource, getApiUrl
+from girder.models.token import Token
 from girder.settings import SettingKey
 from girder.utility import config
 from . import constants
@@ -26,6 +27,17 @@ class NCILogin(Resource):
     self.route('GET', ('endpoint',), self.getEndpoint)
     # self.route('GET', ('callback',), self.callback)
     self.route('GET', ('loginCallback',), self.login)
+    self.route('GET', ('cors',), self.getToken)
+
+  @access.public
+  @autoDescribeRoute(
+    Description('GET Current token from cross origin request.'))
+  def getToken(self):
+    if 'cookie' not in cherrypy.request.headers:
+      return None
+    token = cherrypy.request.headers['cookie'].split('girderToken=')[-1]
+    # print(Token().load(token, force=True, objectId=False))
+    return token
 
   @access.public
   @autoDescribeRoute(
@@ -101,6 +113,8 @@ class NCILogin(Resource):
 
     girderToken = self.sendAuthTokenCookie(user)
 
+    # cherrypy.response.cookie['girderToken']['path'] = Setting().get('NCIAuth.NCI_return_url')
+    # cherrypy.response.cookie['girderToken'] = str(girderToken['_id'])
     raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
 
   @access.public
