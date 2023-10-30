@@ -23,6 +23,7 @@ class PluginSettings(object):
     PROVIDERS_ENABLED = 'NCIAuth.providers_enabled'
     IGNORE_REGISTRATION_POLICY = 'NCIAuth.ignore_registration_policy'
 
+    NCI_CLIENT_ISSUER = 'NCIAuth.NCI_client_issuer'
     NCI_CLIENT_ID = 'NCIAuth.NCI_client_id'
     NCI_CLIENT_SECRET = 'NCIAuth.NCI_client_secret'
     NCI_RETURN_URL = 'NCIAuth.NCI_return_url'

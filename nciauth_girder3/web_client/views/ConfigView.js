@@ -28,6 +28,9 @@ var ConfigView = View.extend({
             }, {
                 key: 'NCIAuth.' + providerId + '_client_secret',
                 value: this.$('#g-oauth-provider-' + providerId + '-client-secret').val().trim()
+            }, {
+                key: 'NCIAuth.' + providerId + '_client_issuer',
+                value: this.$('#g-oauth-provider-' + providerId + '-client-issuer').val().trim()
             }]);
             //    {
             //     key: 'NCIAuth.' + providerId + '_login_url',
@@ -73,6 +76,7 @@ var ConfigView = View.extend({
             settingKeys.push('NCIAuth.' + id + '_return_url');
             settingKeys.push('NCIAuth.' + id + '_client_id');
             settingKeys.push('NCIAuth.' + id + '_client_secret');
+            settingKeys.push('NCIAuth.' + id + '_client_issuer');
             // settingKeys.push('NCIAuth.' + id + '_login_url');
             // settingKeys.push('NCIAuth.' + id + '_validation_url');
         }, this);
@@ -121,6 +125,8 @@ var ConfigView = View.extend({
                     this.settingVals['NCIAuth.' + id + '_client_id']);
                 this.$('#g-oauth-provider-' + id + '-client-secret').val(
                     this.settingVals['NCIAuth.' + id + '_client_secret']);
+                this.$('#g-oauth-provider-' + id + '-client-issuer').val(
+                    this.settingVals['NCIAuth.' + id + '_client_issuer']);
                 // this.$('#g-oauth-provider-' + id + '-login-url').val(
                 //     this.settingVals['NCIAuth.' + id + '_login_url']);
                 // this.$('#g-oauth-provider-' + id + '-validation-url').val(

@@ -20,10 +20,12 @@
               id=`g-oauth-provider-NCI-form`, provider-id='NCI')
       .form-group
         //- label.control-label(for=`g-oauth-provider-NCI-client-id`) Return URL
+        input.input-sm.form-control(id=`g-oauth-provider-NCI-client-issuer`,
+            type="text", placeholder="Itrust Client Issuer" required)
         input.input-sm.form-control(id=`g-oauth-provider-NCI-client-id`,
-            type="text", placeholder="CILogon Client Id" required)
+            type="text", placeholder="Itrust Client Id" required)
         input.input-sm.form-control(id=`g-oauth-provider-NCI-client-secret`,
-            type="text", placeholder="CILogon Client Secret" required)
+            type="text", placeholder="Itrust Client Secret" required)
         input.input-sm.form-control(id=`g-oauth-provider-NCI-api-url`,
             type="text", placeholder="API URL" required)
         input.input-sm.form-control(id=`g-oauth-provider-NCI-return-url`,

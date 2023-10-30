@@ -18,6 +18,7 @@ def validateIgnoreRegistrationPolicy(doc):
     if not isinstance(doc['value'], bool):
         raise ValidationException('Ignore registration policy setting must be boolean.', 'value')
 @setting_utilities.validator({
+    constants.PluginSettings.NCI_CLIENT_ISSUER,
     constants.PluginSettings.NCI_CLIENT_ID,
     constants.PluginSettings.NCI_CLIENT_SECRET,
     constants.PluginSettings.NCI_API_URL,
@@ -34,7 +35,7 @@ class GirderPlugin(plugin.GirderPlugin):
 	DISPLAY_NAME = 'NCIAuth-girder3'
 	CLIENT_SOURCE_PATH = 'web_client'
 	
-	def load(self,info):
+	def load(self, info):
 		info['apiRoot'].nciLogin = rest.NCILogin()
 		print('NCIAuth-girder3: Warning: SettingDefault not enabled!')
 		#SettingDefault.defaults[constants.PluginSettings.PROVIDERS_ENABLED] = []

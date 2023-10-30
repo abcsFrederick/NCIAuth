@@ -10,8 +10,9 @@ import json
 from girder import events
 from girder.models.user import User
 from girder.models.setting import Setting
-from girder.exceptions import RestException
+from girder.exceptions import RestException, ValidationException
 from girder.api.rest import Resource, getApiUrl
+from girder.models.token import Token
 from girder.settings import SettingKey
 from girder.utility import config
 from . import constants
@@ -26,6 +27,17 @@ class NCILogin(Resource):
     self.route('GET', ('endpoint',), self.getEndpoint)
     # self.route('GET', ('callback',), self.callback)
     self.route('GET', ('loginCallback',), self.login)
+    self.route('GET', ('cors',), self.getToken)
+
+  @access.public
+  @autoDescribeRoute(
+    Description('GET Current token from cross origin request.'))
+  def getToken(self):
+    if 'cookie' not in cherrypy.request.headers:
+      return None
+    token = cherrypy.request.headers['cookie'].split('girderToken=')[-1]
+    # print(Token().load(token, force=True, objectId=False))
+    return token
 
   @access.public
   @autoDescribeRoute(
@@ -35,28 +47,31 @@ class NCILogin(Resource):
     # https://sts.nih.gov/ pro
     print(cherrypy.request.params)
     code = cherrypy.request.params['code']
+
+    headers = {'content-type': 'application/x-www-form-urlencoded'}
     data = {'grant_type': 'authorization_code',
             'code': code,
             # 'client_id': 'cilogon:/client_id/' + Setting().get('NCIAuth.NCI_client_id'),
             'client_id': Setting().get('NCIAuth.NCI_client_id'),
             'client_secret': Setting().get('NCIAuth.NCI_client_secret'),
-            'redirect_uri': Setting().get('NCIAuth.NCI_api_url') + '/nciLogin/loginCallback'
+            'redirect_uri': Setting().get('NCIAuth.NCI_api_url') + '/nciLogin/loginCallback/'
           }
     # res = json.loads(requests.post('https://cilogon.org/oauth2/token', data).content) # /auth/oauth/v2/token
-    res = json.loads(requests.post('https://stsstg.nih.gov/auth/oauth/v2/token', data).content)
+    res = json.loads(requests.post('{}/auth/oauth/v2/token'.format(Setting().get('NCIAuth.NCI_client_issuer')), data=data, headers=headers).content)
 
     id_token = res['id_token']
     access_token = res['access_token']
     expire = res["expires_in"]
     data = {'access_token': access_token}
-    userinfo = requests.post('https://stsstg.nih.gov/openid/connect/v1/userinfo', data)
+    userinfo = requests.post('{}/openid/connect/v1/userinfo'.format(Setting().get('NCIAuth.NCI_client_issuer')), data)
     # userinfo = requests.post('https://cilogon.org/oauth2/userinfo', data) # /openid/connect/v1/userinfo
     user = json.loads(userinfo.content)
-    NCIemail = user["email"]
-    NCIfirstName = user["first_name"]
-    NCIlastName = user["last_name"]
-    NCIUsername = user["userid"]
-    user = User().findOne({'email': NCIemail})
+
+    email = user["email"]
+    firstName = user["first_name"]
+    lastName = user["last_name"]
+    username = user["userid"]
+    user = User().findOne({'email': email})
 
     setId = not user
     dirty = False
@@ -69,24 +84,24 @@ class NCILogin(Resource):
           raise RestException(
             'Registration on this instance is closed. Contact an '
             'administrator to create an account for you.')
-      login = self._deriveLogin(NCIemail, NCIfirstName, NCIlastName, userName=NCIUsername)
+      login = self._deriveLogin(email, firstName, lastName, userName=username)
       user = User().createUser(
-        login=login, password=None, firstName=NCIfirstName, lastName=NCIlastName, email=NCIemail)
+        login=login, password=None, firstName=firstName, lastName=lastName, email=email)
     else:
       # Migrate from a legacy format where only 1 provider was stored
       if isinstance(user.get('oauth'), dict):
         user['oauth'] = [user['oauth']]
         dirty = True
       # Update user data from provider
-      if NCIemail != user['email']:
-        user['email'] = NCIemail
+      if email != user['email']:
+        user['email'] = email
         dirty = True
       # Don't set names to empty string
-      if NCIfirstName != user['firstName'] and NCIfirstName:
-        user['firstName'] = NCIfirstName
+      if firstName != user['firstName'] and firstName:
+        user['firstName'] = firstName
         dirty = True
-      if NCIlastName != user['lastName'] and NCIlastName:
-        user['lastName'] = NCIlastName
+      if lastName != user['lastName'] and lastName:
+        user['lastName'] = lastName
         dirty = True
 
       if setId:
@@ -97,9 +112,11 @@ class NCILogin(Resource):
         dirty = True
       if dirty:
         user = User().save(user)
-    print(user)
+
     girderToken = self.sendAuthTokenCookie(user)
 
+    # cherrypy.response.cookie['girderToken']['path'] = Setting().get('NCIAuth.NCI_return_url')
+    # cherrypy.response.cookie['girderToken'] = str(girderToken['_id'])
     raise cherrypy.HTTPRedirect(Setting().get('NCIAuth.NCI_return_url'))
 
   @access.public
@@ -116,11 +133,11 @@ class NCILogin(Resource):
       # "&redirect_uri={}/nciLogin/CIloginCallback" \
       # "&skin=nih".format(Setting().get('NCIAuth.NCI_client_id'), api_url)
       
-      authorization_endpoint = 'https://stsstg.nih.gov/auth/oauth/v2/authorize?' \
+      authorization_endpoint = '{}/auth/oauth/v2/authorize?' \
       'client_id={}' \
       '&response_type=code' \
-      '&redirect_uri={}/nciLogin/loginCallback' \
-      '&scope=phone+email+profile+openid'.format(Setting().get('NCIAuth.NCI_client_id'), api_url)
+      '&redirect_uri={}/nciLogin/loginCallback/' \
+      '&scope=phone+email+profile+openid'.format(Setting().get('NCIAuth.NCI_client_issuer'),Setting().get('NCIAuth.NCI_client_id'), api_url)
       return authorization_endpoint
       # return Setting().get('NCIAuth.NCI_login_url') + '?returnUrl=' + '/'.join((url, 'nciLogin', 'callback'))
     else:
@@ -215,7 +232,6 @@ class NCILogin(Resource):
     # as many OAuth2 services consider that to be private data
 
     for login in self._generateLogins(email, firstName, lastName, userName):
-
       login = login.lower()
 
       if self._testLogin(login):
